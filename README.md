@@ -11,9 +11,9 @@ Before running the application, execute the commands below first:
 Mac/Linux: `export FLASK_APP=application.py`
 Windows: `set FLASK_APP=application.py`
 
-Mac/Linux: `export DATABASE_URL=postgres://vzihzhagmfngky:e520bab65138c9d74fc92b5f48330f530dd8a3e33ecb51c9ca2781ea5fd8ddd4@ec2-174-129-226-232.compute-1.amazonaws.com:5432/d6tj5q6d0li4u6`
+Mac/Linux: `export DATABASE_URL="postgres://wvenojhujcidrk:db3cff2e367514a94dff20e895be599f419c7c92bf5e907f2358e4f8ff7f78f3@ec2-54-163-226-238.compute-1.amazonaws.com:5432/d6k656cqrila1b"`
 
-Windows: `set DATABASE_URL=postgres://vzihzhagmfngky:e520bab65138c9d74fc92b5f48330f530dd8a3e33ecb51c9ca2781ea5fd8ddd4@ec2-174-129-226-232.compute-1.amazonaws.com:5432/d6tj5q6d0li4u6`
+Windows: `set DATABASE_URL="postgres://wvenojhujcidrk:db3cff2e367514a94dff20e895be599f419c7c92bf5e907f2358e4f8ff7f78f3@ec2-54-163-226-238.compute-1.amazonaws.com:5432/d6k656cqrila1b"`
 
 To run the flask application, enter `flask run`.
 
