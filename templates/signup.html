@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Review
+{% endblock %}
+
+{% block body %}
+    <h1>Register For A Free Account!</h1>
+
+    <form action="{{ url_for('register') }}" method="post">
+
+        {{ unmessage }}
+
+        <div class="form-group">
+            <input class="form-control" name="un" placeholder="Unique Username">
+        </div>
+
+        {{ pwmessage }}
+
+        <div class="form-group">
+            <input class="form-control" type="password" name="pw" placeholder="Password (>8 Characters, No Special Characters)">
+        </div>
+
+        <div class="form-group">
+            <button class="btn btn-primary">Register For Account</button>
+        </div>
+
+
+    </form>
+    <br>
+    <br>
+    <form action="{{ url_for('login') }}" attribute target="_blank">
+        <h6>Already have an account?<button class="btn btn-primary">Log In</button></h6>
+    </form>
+{% endblock %}

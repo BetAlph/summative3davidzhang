@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Review
+{% endblock %}
+
+
+
+{% block body %}
+    {% for post in posts %}
+            <article class="media content-section">
+              <div class="media-body">
+                <div class="article-metadata">
+                  <a class="mr-2" href="#">{{ post.title }}</a>
+                  <small class="text-muted">{{ post.year }}</small>
+                </div>
+                <h2><a class="article-title" href="#">{{ post.imdbid }}</a></h2>
+                <p class="article-content">{{ post.imdbrating }}</p>
+              </div>
+            </article>
+    {% endfor %}
+    <h1>Review</h1>
+
+    <h3>Create a Free Access Account</h3>
+    <br>
+
+    <form action="{{ url_for('signup') }}" attribute target="_blank">
+        <h6>Don't have a Review account?<button class="btn btn-primary">Sign Up</button></h6>
+    </form>
+    <br>
+
+    <form action="{{ url_for('login') }}" attribute target="_blank">
+        <h6>Already a registered Review user?<button class="btn btn-primary">Log In</button></h6> 
+    </form>
+
+
+{% endblock %}

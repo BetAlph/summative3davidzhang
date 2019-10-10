@@ -29,13 +29,14 @@ from sqlalchemy.orm import scoped_session, sessionmaker
 from flask_login import LoginManager,login_user, current_user, logout_user, login_required
 
 
-
 app = Flask(__name__)
 
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+SECRET_KEY = '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa6'
 
 @login_manager.user_loader
 def load_user(user_id):

@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% if is_logged %}
+      <form method="POST" action="">
+        <div class="form-group">
+          {{ form.search.label(class="form-control-label") }}
+          {{ form.search(class="form-control form-control-lg") }}
+        </div>
+      </form>
+    {% endif %}
+    {% for result in searchresults %}
+        <article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+              <small class="article-title">IMDb ID: {{ result.imdbID }}</small>
+            </div>
+            <h2><a class="article-title" href="/movies/{{ result.imdbID }}">{{ result.Title }}</a></h2>
+            <p class="article-content">
+            <img style="padding: 0 15px; float: left;" src="{{ result.Poster }}" alt="{{ result.Poster }}" height="265" width="210"></img>
+            {{ result.Year }}
+            IMDb Rating: {{ result.imdbRating }}
+            Metascore: {{ result.Metascore }}
+            Rating: {{ result.Rated }}
+            Rated: {{ result.Released }}
+            Runtime: {{ result.Runtime }}
+            Genre: {{ result.Genre }}
+            Languages: {{ result.Language }}
+            <br>
+            <br>
+            Directed by: {{ result.Director }}
+            Written by: {{ result.Writer }}
+            Actors: {{ result.Actors }}
+            Synopsis: {{ result.Plot }}
+            Country: {{ result.Country }}
+            Awards: {{ result.Awards }}
+            Type: {{ result.Type }}
+            DVD Released On: {{ result.DVD }}
+            Box Office: {{ result.BoxOffice }}
+            Produced by: {{ result.Production }}
+            <a class="mr-2" href="{{ result.Website }}">Official Website</a>
+            </p>
+          </div>
+        </article>
+    {% endfor %}
+    {% for post in posts %}
+        <article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+              <a class="mr-2" href="#">{{ post.author }}</a>
+              <small class="text-muted">{{ post.date_posted }}</small>
+            </div>
+            <h2><a class="article-title" href="#">{{ post.title }}</a></h2>
+            <p class="article-content">{{ post.content }}</p>
+          </div>
+        </article>
+    {% endfor %}
+
+{% endblock content %}
