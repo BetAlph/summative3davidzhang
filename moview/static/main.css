@@ -1,15 +1,28 @@
+@font-face {
+  font-family: "Futura";
+  src: url(sansation_light.woff);
+}
+
 body {
-  background: #fafafa;
-  color: #333333;
+  background: #fefefe;
   margin-top: 5rem;
+}
+
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #101010;
+  border-bottom: 6px solid #fe9800;
+  font-family: "Futura"
 }
 
 h1, h2, h3, h4, h5, h6 {
   color: #444444;
 }
 
-.bg-steel {
-  background-color: #5f788a;
+.navbar .navbar-expand-md .navbar-dark .bg-steel .fixed-top {
+  color: #f9f9f9;
 }
 
 .site-header .navbar-nav .nav-link {
@@ -78,3 +91,11 @@ a.article-title:hover {
 .account-heading {
   font-size: 2.5rem;
 }
+
+/* List styling for footer */
+ul {
+  list-style:none;
+  padding-left:0; 
+}
+
+wp_register_style( 'custom-style', get_template_directory_uri() . '/css/custom-style.css', array(), rand(111,9999), 'all' );

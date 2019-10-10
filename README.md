@@ -18,3 +18,6 @@ Windows: `set DATABASE_URL="postgres://wvenojhujcidrk:db3cff2e367514a94dff20e895
 To run the flask application, enter `flask run`.
 
 The website is now hosted on `127.0.0.1:5000`.
+
+Resources:
+`Futura.ttf` Downloaded from https://ttfonts.net/download/17298.htm

@@ -9,18 +9,14 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
-
-    {% if title %}
-        <title>Flask Blog - {{ title }}</title>
-    {% else %}
-        <title>Flask Blog</title>
-    {% endif %}
+    <title>Moveu</title>
+    <link rel="icon" href="/static/img/Moveu-Logo.png">
 </head>
 <body>
     <header class="site-header">
       <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
-          <a class="navbar-brand mr-4" href="/">Flask Blog</a>
+          <a class="navbar-brand mr-4" href="/">Moveu</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -72,11 +68,60 @@
       </div>
     </main>
 
-
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <!--<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  -->
 </body>
+
+<footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-6">
+
+        <div class="title">Top 10 Highest Rated Movies</div>
+        <ul>
+          <li><a href="https://www.popcorn.app/sg/joker/movie/10815">Joker</a></li>
+          <li><a href="https://www.popcorn.app/sg/the-captain/movie/12798">The Captain</a></li>
+          <li><a href="https://www.popcorn.app/sg/gemini-man/movie/4854">Gemini Man</a></li>
+          <li><a href="https://www.popcorn.app/sg/the-farewell/movie/12365">The Farewell</a></li>
+          <li><a href="https://www.popcorn.app/sg/weathering-with-you/movie/12100">Weathering With You</a></li>
+          <li><a href="https://www.popcorn.app/sg/asuran/movie/12784">Asuran</a></li>
+          <li><a href="https://www.popcorn.app/sg/my-people-my-country/movie/12742">My People, My Country</a></li>
+          <li><a href="https://www.popcorn.app/sg/hustlers/movie/12411">Hustlers</a></li>
+          <li><a href="https://www.popcorn.app/sg/ad-astra/movie/6866">Ad Astra</a></li>
+          <li><a href="https://www.popcorn.app/sg/it-chapter-two/movie/10090">It: Chapter Two</a></li>
+        </ul>
+      </div>
+
+      <div class="col-sm-6">
+
+        <div class="title">Top 10 Movies Rated by Our Users</div>
+        <ul>
+          <li><a href="https://www.popcorn.app/sg/gemini-man/movie/4854">Gemini Man</a></li>
+          <li><a href="https://www.popcorn.app/sg/the-sky-is-pink/movie/12775">The Sky Is Pink</a></li>
+          <li><a href="https://www.popcorn.app/sg/zombieland-2/movie/9034">Zombieland 2</a></li>
+          <li><a href="https://www.popcorn.app/sg/metallica--san-francisco-symphony-sm2/movie/12369">Metallica & San Francisco Symphony: S&M2;</a></li>
+          <li><a href="https://www.popcorn.app/sg/two-blue-stripes-/movie/12763">Two Blue Stripes </a></li>
+          <li><a href="https://www.popcorn.app/sg/jinpa/movie/12665">Jinpa</a></li>
+          <li><a href="https://www.popcorn.app/sg/martha--niki/movie/12738">Martha & Niki</a></li>
+          <li><a href="https://www.popcorn.app/sg/tom-of-finland-/movie/9529">Tom Of Finland </a></li>
+        </ul>
+
+      </div>
+
+    </div>
+    <br>
+    <div class="row">
+      <hr>
+      <div class="title col-sm-12">
+        <h4>Moveu. The best movie reviews in town.</h4>
+        <p>We collect reviews from professional critiques to bring you ratings & reviews from the best of the best.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
 </html>
