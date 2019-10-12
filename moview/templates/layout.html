@@ -27,7 +27,7 @@
             </div>
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
-              {% if is_logged %}
+              {% if session['is_logged']  %}
                 <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
               {% else %}
                 <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
@@ -40,7 +40,7 @@
     </header>
     <main role="main" class="container">
       <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
           {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
               {% for category, message in messages %}
@@ -51,19 +51,6 @@
             {% endif %}
           {% endwith %}
           {% block content %}{% endblock %}
-        </div>
-        <div class="col-md-4">
-          <div class="content-section">
-            <h3>Our Sidebar</h3>
-            <p class='text-muted'>You can put any information here you'd like.
-              <ul class="list-group">
-                <li class="list-group-item list-group-item-light">Latest Posts</li>
-                <li class="list-group-item list-group-item-light">Announcements</li>
-                <li class="list-group-item list-group-item-light">Calendars</li>
-                <li class="list-group-item list-group-item-light">etc</li>
-              </ul>
-            </p>
-          </div>
         </div>
       </div>
     </main>
@@ -81,45 +68,29 @@
     <div class="row">
       <div class="col-sm-6">
 
-        <div class="title">Top 10 Highest Rated Movies</div>
+        <div class="title">Top 5 Highest Rated Movies</div>
         <ul>
-          <li><a href="https://www.popcorn.app/sg/joker/movie/10815">Joker</a></li>
-          <li><a href="https://www.popcorn.app/sg/the-captain/movie/12798">The Captain</a></li>
-          <li><a href="https://www.popcorn.app/sg/gemini-man/movie/4854">Gemini Man</a></li>
-          <li><a href="https://www.popcorn.app/sg/the-farewell/movie/12365">The Farewell</a></li>
-          <li><a href="https://www.popcorn.app/sg/weathering-with-you/movie/12100">Weathering With You</a></li>
-          <li><a href="https://www.popcorn.app/sg/asuran/movie/12784">Asuran</a></li>
-          <li><a href="https://www.popcorn.app/sg/my-people-my-country/movie/12742">My People, My Country</a></li>
-          <li><a href="https://www.popcorn.app/sg/hustlers/movie/12411">Hustlers</a></li>
-          <li><a href="https://www.popcorn.app/sg/ad-astra/movie/6866">Ad Astra</a></li>
-          <li><a href="https://www.popcorn.app/sg/it-chapter-two/movie/10090">It: Chapter Two</a></li>
+          <li><a href="{{ url_for('movie', imdb_id='tt0111161') }}">The Shawshank Redemption</a></li>
+          <li><a href="{{ url_for('movie', imdb_id='tt0068646') }}">The Godfather</a></li>
+          <li><a href="#">Joker (2019)</a> (New Release, Coming Soon!)</li>
+          <li><a href="{{ url_for('movie', imdb_id='tt0468569') }}">The Dark Knight</a></li>
+          <li><a href="{{ url_for('movie', imdb_id='tt0071562') }}">The Godfather: Part II</a></li>
         </ul>
       </div>
 
       <div class="col-sm-6">
 
-        <div class="title">Top 10 Movies Rated by Our Users</div>
+        <div class="title">Top 5 Movies Rated by Our Users</div>
         <ul>
-          <li><a href="https://www.popcorn.app/sg/gemini-man/movie/4854">Gemini Man</a></li>
-          <li><a href="https://www.popcorn.app/sg/the-sky-is-pink/movie/12775">The Sky Is Pink</a></li>
-          <li><a href="https://www.popcorn.app/sg/zombieland-2/movie/9034">Zombieland 2</a></li>
-          <li><a href="https://www.popcorn.app/sg/metallica--san-francisco-symphony-sm2/movie/12369">Metallica & San Francisco Symphony: S&M2;</a></li>
-          <li><a href="https://www.popcorn.app/sg/two-blue-stripes-/movie/12763">Two Blue Stripes </a></li>
-          <li><a href="https://www.popcorn.app/sg/jinpa/movie/12665">Jinpa</a></li>
-          <li><a href="https://www.popcorn.app/sg/martha--niki/movie/12738">Martha & Niki</a></li>
-          <li><a href="https://www.popcorn.app/sg/tom-of-finland-/movie/9529">Tom Of Finland </a></li>
+          <li><a href="{{ url_for('movie', imdb_id='tt0111161') }}">The Shawshank Redemption</a></li>
+          <li><a href="{{ url_for('movie', imdb_id='tt0068646') }}">The Godfather</a></li>
+          <li><a href="#">Joker (2019)</a> (New Release, Coming Soon!)</li>
+          <li><a href="{{ url_for('movie', imdb_id='tt0468569') }}">The Dark Knight</a></li>
+          <li><a href="{{ url_for('movie', imdb_id='tt0071562') }}">The Godfather: Part II</a></li>
         </ul>
 
       </div>
 
-    </div>
-    <br>
-    <div class="row">
-      <hr>
-      <div class="title col-sm-12">
-        <h4>Moveu. The best movie reviews in town.</h4>
-        <p>We collect reviews from professional critiques to bring you ratings & reviews from the best of the best.</p>
-      </div>
     </div>
   </div>
 </footer>

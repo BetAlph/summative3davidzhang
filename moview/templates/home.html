@@ -42,17 +42,33 @@
           </div>
         </article>
     {% endfor %}
-    {% for post in posts %}
-        <article class="media content-section">
-          <div class="media-body">
-            <div class="article-metadata">
-              <a class="mr-2" href="#">{{ post.author }}</a>
-              <small class="text-muted">{{ post.date_posted }}</small>
+    <br>
+    <br>
+    <br>
+    <br>
+    <div>
+      <center> <h1>Moveu. The best movie reviews in town.</h1></center>
+      <h3>We collect reviews from professional critiques to bring you ratings & reviews from the best of the best.</h3>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <div class="title col-sm-12">
+      <h2>Accolades From Critiques</h2>
+      {% for accolade in accolades %}
+          <article class="media content-section">
+            <div class="media-body">
+              <div class="article-metadata">
+                <h4 class="mr-2">{{ accolade.title }}</h4>
+              </div>
+              <h5>{{ accolade.author }}</h5>
             </div>
-            <h2><a class="article-title" href="#">{{ post.title }}</a></h2>
-            <p class="article-content">{{ post.content }}</p>
-          </div>
-        </article>
-    {% endfor %}
+          </article>
+      {% endfor %}
+    </div>
+    <br>
+    <br>
+    <br>
 
 {% endblock content %}

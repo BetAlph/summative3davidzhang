@@ -20,9 +20,8 @@ class LoginForm(FlaskForm):
 class MovieSearchForm(FlaskForm):
     search = StringField('Search For Movies:')
 
-class PostForm(FlaskForm):
-    title = StringField('Title', validators=[DataRequired()])
+class ReviewForm(FlaskForm):
     content = TextAreaField('Content', validators=[DataRequired()])
-    submit = SubmitField('Post')
     choices = [('1', '1'),('2', '2'),('3', '3'),('4', '4'),('5', '5'),('6', '6'),('7', '7'),('8', '8'),('9', '9'),('10', '10'),]
     select = SelectField('Rate the Movie!', choices=choices)
+    submit = SubmitField('Post')

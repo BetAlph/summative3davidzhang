@@ -1,26 +1,100 @@
-
 {% extends "layout.html" %}
 
-{% block title %}
-    Flight
-{% endblock %}
-
-{% block body %}
-    <h1>Flight Details</h1>
-
+<!-- attrlist = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "Director", "Writer", "Actors", "Plot", "Language", "Country", "Awards", "Poster", "Metascore", "imdbRating", "imdbVotes", "imdbID", "Type", "DVD", "BoxOffice", "Production", "Website", "Response","lowercase"] -->
+{% block content %}
+    <br>
+    <center><h1>{{ movie.Title }}</h1></center>
+    <br>
+    <br>
+    <div class="row">
+    <div class="title col-sm-3"><img style="padding: 0 15px; float: left;" src="{{ movie.Poster }}" alt="{{ movie.Poster }}" height="265" width="210"></img>
+    </div>
+    <div class="title col-sm-9">
+    <h4>Movie Info</h4>
     <ul>
-        <li>Origin: {{ flight.origin }}</li>
-        <li>Destination: {{ flight.destination }}</li>
-        <li>Duration: {{ flight.duration}} minutes</li>
+        <li>Rating: {{ movie.Rated }}</li>
+        <li>Release Date: {{ movie.Released }}</li>
+        <li>Runtime: {{ movie.Runtime }}</li>
+        <li>Genre: {{ movie.Genre }}</li>
+        <li>Credits: Director(s) - {{ movie.Director }}, Writer(s) - {{ movie.Writer }}, Actor(s) - {{ movie.Actors }}</li>
+        <li>Languages: {{ movie.Language }}</li>
+        <li>Synopsis: {{ movie.Plot }}</li>
+        <li>Country: {{ movie.Country }}</li>
+        <li>Awards: {{ movie.Awards }}</li>
+        <li>Type: {{ movie.Type }}</li>
+        <li>DVD Released On: {{ movie.DVD }}</li>
+        <li>Box Office: {{ movie.BoxOffice }}</li>
+        <li>Produced by: {{ movie.Production }}</li>
+        <li>Runtime: {{ movie.Runtime }}</li>
+        <br>
+        <h4>Critique Ratings</h4>
+        <li>Metascore: {{ movie.Metascore }}</li>
+        <li>imdbRating: {{ movie.imdbRating }}</li>
+        <li>imdbVotes: {{ movie.imdbVotes }}</li>
+        <li>Average Score: {{ avgR }}</li>
     </ul>
+    </div>
+    </div>
+    <br>
+    <br>
+    <br>
+    <div class="row">
+    <h2>Reviews by Moveu Users</h2>
+    </div>
+    <br>
+    {% for review in reviews %}
+        <article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+              <div class="mr-12" href="#">{{ review.Author }}</div>
+              <div class="text-muted">{{ review.Rating }}</div>
+            </div>
+            <h2>{{ review.ReviewTitle }}</h2>
+            <p class="article-content">{{ review.ReviewContent }}</p>
+          </div>
+        </article>
 
-    <h2>Passengers</h2>
+    {% else %}
+        <h4>No User Reviews Found. Be The First To Review This Movie!</h4>
+    {% endfor %}
+    <br>
+    <br>
+    <br>
+    {% if session['is_logged'] %}
+      {% if not userRev %}
+          <div class="content-section">
+            <form method="POST" action="">
+                {{ form.hidden_tag() }}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4">Submit A Review!</legend>
+                    <div class="form-group">
+                        {{ form.content.label(class="form-control-label") }}
+                        {{ form.content(class="form-control form-control-lg") }}
+                    </div>
+                    <div class="form-group">
+                        {{ form.select.label(class="form-control-label") }}
+                        {{ form.select(class="form-control form-control-lg") }}
+                    </div>
+                </fieldset>
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-outline-info") }}
+                </div>
+            </form>
+          </div>
+      {% endif %}
+    {% endif %}
+
+    <div>
+    <br>
+    <br>
+    <br>
+    <!--
     <ul>
         {% for passenger in passengers %}
             <li>{{ passenger.name }}</li>
         {% else %}
             <li>No passengers.</li>
         {% endfor %}
-    </ul>
+    </ul>-->
 
 {% endblock %}

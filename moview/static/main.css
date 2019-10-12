@@ -3,6 +3,7 @@
   src: url(sansation_light.woff);
 }
 
+
 body {
   background: #fefefe;
   margin-top: 5rem;
@@ -95,7 +96,7 @@ a.article-title:hover {
 /* List styling for footer */
 ul {
   list-style:none;
-  padding-left:0; 
+  padding-left:0;
 }
 
 wp_register_style( 'custom-style', get_template_directory_uri() . '/css/custom-style.css', array(), rand(111,9999), 'all' );

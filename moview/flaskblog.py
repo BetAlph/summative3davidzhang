@@ -1,33 +1,27 @@
 import os
-from flask import Flask, render_template, url_for, flash, redirect, request
-from forms import RegistrationForm, LoginForm, MovieSearchForm, PostForm
+from flask import Flask, render_template, url_for, flash, redirect, request, session, make_response, abort
+from forms import RegistrationForm, LoginForm, MovieSearchForm, ReviewForm
 from sqlalchemy import *
 from sqlalchemy.orm import scoped_session, sessionmaker
-
-from postlist import *
+from flask_session import Session
+import omdb
+from accolades import *
 
 app = Flask(__name__)
-SECRET_KEY = os.urandom(32)
+SECRET_KEY = '\x96^\xe7W\xd3#\xb8\x97\x98L\xd9\xb0\r\x83cD\x14\x87k\xfe\xefY\xff\x87'
 app.config['SECRET_KEY'] = SECRET_KEY
+app.secret_key = 'super secret key'
+app.config['SESSION_TYPE'] = 'filesystem'
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
+Session(app)
 
 '''
-HOW TO CHECK GLOBAL VARIABLES INSIDE JINJA
-TO DO
-So basically:
-1. Download a copy of username password pairs from DB
-2. User inputs username and password into form
-3. Check if form.username && form.password matches any pair
-4. If match, set GLOBAL is_logged=True. Otherwise return login page again.
-5. Redirect to home page
-
 export FLASK_APP="flaskblog.py" DATABASE_URL="postgres://wvenojhujcidrk:db3cff2e367514a94dff20e895be599f419c7c92bf5e907f2358e4f8ff7f78f3@ec2-54-163-226-238.compute-1.amazonaws.com:5432/d6k656cqrila1b" FLASK_DEBUG=1
-
 '''
 
-is_logged = False
-current_user = ""
+
+
 
 usernames = db.execute("SELECT username FROM users").fetchall()
 searchresults = []
@@ -37,8 +31,13 @@ attrlist = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "Director"
 @app.route("/")
 @app.route("/home", methods=['GET','POST'])
 def home():
+
+    if 'is_logged' not in session:
+        session['is_logged'] = False
+    if 'current_user' not in session:
+        session['current_user'] = ""
     form = MovieSearchForm()
-    if is_logged:
+    if session['is_logged'] == True:
 
         if (form.search.data != None):
             global searchresults
@@ -52,14 +51,14 @@ def home():
                 searchresults.append(temp)
 
 
-        return render_template('home.html', posts=posts,is_logged=True, form=form,searchresults = searchresults)
+        return render_template('home.html', accolades=accolades ,is_logged=True, form=form,searchresults = searchresults)
     else:
-        return render_template('home.html', posts=posts)
-    return render_template('home.html', posts=posts,is_logged=True,form=form)
+        return render_template('home.html', accolades=accolades)
+    return render_template('home.html', accolades=accolades,is_logged=True,form=form)
 
 @app.route("/about")
 def about():
-    if is_logged:
+    if session['is_logged']:
         return render_template('about.html', title='About',is_logged=True)
     else:
         return render_template('about.html', title='About')
@@ -69,7 +68,7 @@ def about():
 def register():
     unok = True
     emok = True
-    if is_logged:
+    if session['is_logged']:
         return redirect(url_for('home'))
     usernames = db.execute("SELECT username FROM users").fetchall()
     emails = db.execute("SELECT email FROM users").fetchall()
@@ -103,8 +102,10 @@ def register():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login():
-    global is_logged
-    global current_user
+    if 'is_logged' not in session:
+        session['is_logged'] = False
+    if 'current_user' not in session:
+        session['current_user'] = ""
     loginok = False
     form = LoginForm()
     if form.validate_on_submit():
@@ -132,45 +133,81 @@ def login():
         ''' userinfo Is A Row Of Data, userinfo[0][3] Is The Password Of User'''
         try:
             if form.password.data == userinfo[0][3]:
-                is_logged = True
-                current_user = form.username.data
-                message = 'You have been logged in, ' + current_user + '!'
+                session['current_user'] = form.username.data
+                message = 'You have been logged in, ' + session['current_user'] + '!'
+
                 flash(message, 'success')
+
+                '''if form.remember:
+                    session.permanent = True
+                else:
+                    session.permanent = False'''
+                session['is_logged'] = True
                 return redirect(url_for('home'))
             else:
                 flash('Login Unsuccessful. Please check username and password and make sure that they are correct!', 'danger')
         except:
             flash('Login Unsuccessful. Please check username and password and make sure that they are correct!', 'danger')
+
     return render_template('login.html', title='Login', form=form)
 
 @app.route("/logout")
 def logout():
-    global is_logged
-    global current_user
-    is_logged = False
-    current_user = ""
+    session['is_logged'] = False
+    session['current_user'] = ""
     flash("You have been logged out.", "success")
     return redirect(url_for('home'))
 
-@app.route("/movies/<imdb_id>")
+@app.route("/movies/<imdb_id>", methods=['GET', 'POST'])
 def movie(imdb_id):
+
+    form = ReviewForm()
+
+    if form.validate_on_submit():
+        db.execute("INSERT INTO reviews (userid, imdbid, rating, content) VALUES (:un, :ii, :ra, :co);",{"un": session['current_user'], "ii": imdb_id, "ra": form.select.data, "co": form.content.data})
+        db.commit()
+
+        return(redirect(url_for('movie', imdb_id=imdb_id)))
     """Lists details about a single movie."""
 
     # Make sure movie exists.
     movie = db.execute("SELECT * FROM movies WHERE imdbid = :id", {'id': imdb_id}).fetchone()
-    if movie is None:
-        return render_template("error.html", message="No such movie.")
+    print(movie)
+    if movie == None:
+        abort(404)
+    else:
+        temp = {}
+        attrlist = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "Director", "Writer", "Actors", "Plot", "Language", "Country", "Awards", "Poster", "Metascore", "imdbRating", "imdbVotes", "imdbID", "Type", "DVD", "BoxOffice", "Production", "Website", "Response","lowercase"]
 
-    temp = {}
-    attrlist = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "Director", "Writer", "Actors", "Plot", "Language", "Country", "Awards", "Poster", "Metascore", "imdbRating", "imdbVotes", "imdbID", "Type", "DVD", "BoxOffice", "Production", "Website", "Response","lowercase"]
-    for j in range(len(movie)):
-        temp[attrlist[j]] = movie[j]
-
-    # Get all reviews.
-    reviews = db.execute("SELECT * FROM reviews WHERE imdbid = :imdbid",{"imdbid": imdb_id}).fetchone()
-    if reviews is None:
+        for j in range(len(movie)):
+            temp[attrlist[j]] = movie[j]
+        # Get all reviews.
+        revu = db.execute("SELECT * FROM reviews WHERE imdbid = :imdbid",{"imdbid": imdb_id}).fetchall()
+        attrlist2 = ["Author", "MovieID", "Rating", "ReviewContent"]
         reviews = []
-    return render_template("movie.html", movie=temp, reviews=reviews)
+        temp2 = {}
+
+        userRev = False
+
+        for i in range(len(revu)):
+            temp2 = {}
+            for j in range(len(revu[i])):
+                temp2[attrlist2[j]] = revu[i][j]
+            reviews.append(temp2)
+            if temp2['Author'] == session['current_user']:
+                userRev = True
+
+        if revu == None:
+            reviews = []
+        avgR = ( float( temp['Metascore'] ) + float( temp['imdbRating'] ) * 10 ) / 2
+
+        return render_template("movie.html", movie=temp, reviews=reviews, avgR=avgR, form = form, userRev=userRev)
+
+@app.errorhandler(404)
+def not_found(error):
+    return make_response(render_template('error.html'), 404)
+
+'''
 
 @app.route("/movies/<imdb_id>/new")
 def newreview(imdb_id):
@@ -197,3 +234,4 @@ def new_post():
         return redirect(url_for('home'))
     return render_template('create_post.html', title='New Post',
                            form=form, legend='New Post')
+'''
