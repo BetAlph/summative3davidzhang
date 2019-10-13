@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Flights §
+{% endblock %}
+
+{% block body %}
+    <h1>Book a Flight</h1>
+
+    <form action="{{ url_for('book') }}" method="post">
+
+        {% message %}
+
+        <div class="form-group">
+            <input class="form-control" name="name" placeholder="Username">
+        </div>
+
+        <div class="form-group">
+            <button class="btn btn-primary:hover">Book Flight</button>
+        </div>
+
+    </form>
+{% endblock %}

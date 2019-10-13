@@ -1,5 +1,5 @@
 import os
-from flask import Flask, render_template, url_for, flash, redirect, request, session, make_response, abort
+from flask import Flask, render_template, url_for, flash, redirect, request, session, make_response, abort, jsonify
 from forms import RegistrationForm, LoginForm, MovieSearchForm, ReviewForm
 from sqlalchemy import *
 from sqlalchemy.orm import scoped_session, sessionmaker
@@ -15,6 +15,7 @@ app.config['SESSION_TYPE'] = 'filesystem'
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 Session(app)
+app.config['JSON_SORT_KEYS'] = False
 
 '''
 export FLASK_APP="flaskblog.py" DATABASE_URL="postgres://wvenojhujcidrk:db3cff2e367514a94dff20e895be599f419c7c92bf5e907f2358e4f8ff7f78f3@ec2-54-163-226-238.compute-1.amazonaws.com:5432/d6k656cqrila1b" FLASK_DEBUG=1
@@ -26,9 +27,11 @@ export FLASK_APP="flaskblog.py" DATABASE_URL="postgres://wvenojhujcidrk:db3cff2e
 usernames = db.execute("SELECT username FROM users").fetchall()
 searchresults = []
 
-attrlist = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "Director", "Writer", "Actors", "Plot", "Language", "Country", "Awards", "Poster", "Metascore", "imdbRating", "imdbVotes", "imdbID", "Type", "DVD", "BoxOffice", "Production", "Website", "Response"]
 
-@app.route("/")
+API_KEY = '2c402f70'
+omdb.set_default('apikey', API_KEY)
+
+@app.route("/", methods=['GET','POST'])
 @app.route("/home", methods=['GET','POST'])
 def home():
 
@@ -43,13 +46,23 @@ def home():
             global searchresults
             searchresults = []
             results = db.execute("SELECT * FROM movies WHERE title LIKE :src OR lowercase LIKE :src OR year LIKE :src OR imdbid LIKE :src;",{"src": "%"+form.search.data+"%"}).fetchall()
+            for result in results:
+                imdb_id = result[3]
+                attrlist = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "Director", "Writer", "Actors", "Plot", "Language", "Country", "Awards", "Poster", "Metascore", "imdbRating", "imdbVotes", "imdbID", "Type", "DVD", "BoxOffice", "Production", "Website", "Response"]
+                omdbResults = omdb.request(i=imdb_id)
+                omdbData = omdbResults.json()
+                temp = {}
+                for attr in attrlist:
+                    temp[attr] = omdbData[attr]
+                searchresults.append(temp)
+            '''
             for i in range(len(results)):
                 temp = {}
                 attrlist = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "Director", "Writer", "Actors", "Plot", "Language", "Country", "Awards", "Poster", "Metascore", "imdbRating", "imdbVotes", "imdbID", "Type", "DVD", "BoxOffice", "Production", "Website", "Response","lowercase"]
                 for j in range(len(results[i])):
                     temp[attrlist[j]] = results[i][j]
                 searchresults.append(temp)
-
+'''
 
         return render_template('home.html', accolades=accolades ,is_logged=True, form=form,searchresults = searchresults)
     else:
@@ -176,8 +189,13 @@ def movie(imdb_id):
     if movie == None:
         abort(404)
     else:
+        imdb_id = movie[3]
+        attrlist = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "Director", "Writer", "Actors", "Plot", "Language", "Country", "Awards", "Poster", "Metascore", "imdbRating", "imdbVotes", "imdbID", "Type", "DVD", "BoxOffice", "Production", "Website", "Response"]
+        omdbResults = omdb.request(i=imdb_id)
+        omdbData = omdbResults.json()
         temp = {}
-        attrlist = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "Director", "Writer", "Actors", "Plot", "Language", "Country", "Awards", "Poster", "Metascore", "imdbRating", "imdbVotes", "imdbID", "Type", "DVD", "BoxOffice", "Production", "Website", "Response","lowercase"]
+        for attr in attrlist:
+            temp[attr] = omdbData[attr]
 
         for j in range(len(movie)):
             temp[attrlist[j]] = movie[j]
@@ -196,42 +214,67 @@ def movie(imdb_id):
             reviews.append(temp2)
             if temp2['Author'] == session['current_user']:
                 userRev = True
-
+        print(temp)
         if revu == None:
             reviews = []
         avgR = ( float( temp['Metascore'] ) + float( temp['imdbRating'] ) * 10 ) / 2
 
         return render_template("movie.html", movie=temp, reviews=reviews, avgR=avgR, form = form, userRev=userRev)
 
+@app.route('/api/<imdb_id>', methods=["GET"])
+def get_api(imdb_id):
+
+    try:
+        movie = db.execute("SELECT * FROM movies WHERE imdbid = :id", {"id": imdb_id}).fetchall()
+        reviews = db.execute("SELECT * FROM reviews WHERE imdbid = :id", {"id": imdb_id}).fetchall()
+        avgS = 0
+        c = 0
+
+        imdb_id = movie[0][3]
+        attrlist = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "Director", "Writer", "Actors", "Plot", "Language", "Country", "Awards", "Poster", "Metascore", "imdbRating", "imdbVotes", "imdbID", "Type", "DVD", "BoxOffice", "Production", "Website", "Response"]
+        omdbResults = omdb.request(i=imdb_id)
+        omdbData = omdbResults.json()
+        movieInfo = {}
+        for attr in attrlist:
+            movieInfo[attr] = omdbData[attr]
+
+        for review in reviews:
+            avgS += review[2]
+            c += 1
+        avgS = avgS / c
+        avgS = round(avgS,1)
+        print(avgS)
+        print(movieInfo)
+
+        finalRes = {}
+        finalRes['title'] = movieInfo['Title']
+        finalRes['year'] = movieInfo['Year']
+        finalRes['imdb_id'] = movieInfo['imdbID']
+        finalRes['director'] = movieInfo['Director']
+        finalRes['actors'] = movieInfo['Actors']
+        finalRes['imdb_rating'] = movieInfo['imdbRating']
+        finalRes['review_count'] = len(reviews)
+        finalRes['average_score'] = avgS
+        '''
+        finalRes = {
+            'title': movieInfo['Title'],
+            'year': movieInfo['Year'],
+            'imdb_id': movieInfo['imdbID'],
+            'director': movieInfo['Director'],
+            'actors': movieInfo['Actors'],
+            'imdb_rating': movieInfo['imdbRating'],
+            'review_count': len(reviews),
+            'average_score': avgS
+
+        }
+        '''
+        print(type(finalRes))
+        return jsonify(finalRes)
+        print("jsonified")
+
+    except:
+        abort(404)
+
 @app.errorhandler(404)
 def not_found(error):
     return make_response(render_template('error.html'), 404)
-
-'''
-
-@app.route("/movies/<imdb_id>/new")
-def newreview(imdb_id):
-    form = PostForm()
-    """Allows users to write posts."""
-
-    # Make sure user hasn't made a review already.
-    review = db.execute("SELECT * FROM reviews WHERE userid = :uid AND imdbid = :id", {'': current_user, 'id': imdb_id}).fetchone()
-    if movie is not None:
-        return redirect(url_for('movies/imdb_id'))
-    return render_template('create_post.html', title='New Post',
-                           form=form, legend='New Post')
-
-@app.route("/post/new", methods=['GET', 'POST'])
-def new_post():
-    if is_logged == False:
-        return redirect(url_for('home'))
-    form = PostForm()
-    if form.validate_on_submit():
-        post = Post(title=form.title.data, content=form.content.data, author=current_user)
-        db.session.add(post)
-        db.session.commit()
-        flash('Your post has been created!', 'success')
-        return redirect(url_for('home'))
-    return render_template('create_post.html', title='New Post',
-                           form=form, legend='New Post')
-'''
