@@ -7,6 +7,7 @@ from flask_session import Session
 import omdb
 from accolades import *
 
+#app configs for SQL, SQLAlchemy & Flask
 app = Flask(__name__)
 SECRET_KEY = '\x96^\xe7W\xd3#\xb8\x97\x98L\xd9\xb0\r\x83cD\x14\x87k\xfe\xefY\xff\x87'
 app.config['SECRET_KEY'] = SECRET_KEY
@@ -15,71 +16,87 @@ app.config['SESSION_TYPE'] = 'filesystem'
 engine = create_engine(os.getenv("DATABASE_URL"))
 db = scoped_session(sessionmaker(bind=engine))
 Session(app)
+
+#Ensure jsonify() does not sort order of keys in dictionary to give desired api output
 app.config['JSON_SORT_KEYS'] = False
 
-'''
-export FLASK_APP="flaskblog.py" DATABASE_URL="postgres://wvenojhujcidrk:db3cff2e367514a94dff20e895be599f419c7c92bf5e907f2358e4f8ff7f78f3@ec2-54-163-226-238.compute-1.amazonaws.com:5432/d6k656cqrila1b" FLASK_DEBUG=1
-'''
-
-
-
-
-usernames = db.execute("SELECT username FROM users").fetchall()
-searchresults = []
-
-
+#omdb settings
 API_KEY = '2c402f70'
-omdb.set_default('apikey', API_KEY)
+omdb.set_default('apikey', API_KEY) #For retrival of info from omdb
 
+
+#Routes
+
+#Route for home & default page
 @app.route("/", methods=['GET','POST'])
 @app.route("/home", methods=['GET','POST'])
 def home():
+    searchresults = []
 
+    #Ensures is_logged & current_user are in session
     if 'is_logged' not in session:
         session['is_logged'] = False
     if 'current_user' not in session:
         session['current_user'] = ""
+
+    #Uses the Movie Search Form from forms.py
     form = MovieSearchForm()
+
+    #Only display form if user is logged in
     if session['is_logged'] == True:
 
+        #Display search results
         if (form.search.data != None):
-            global searchresults
             searchresults = []
+
+            #Find results from movies in DB
             results = db.execute("SELECT * FROM movies WHERE title LIKE :src OR lowercase LIKE :src OR year LIKE :src OR imdbid LIKE :src;",{"src": "%"+form.search.data+"%"}).fetchall()
             for result in results:
+
+                #Use imdbID to retrieve more information from omdb
                 imdb_id = result[3]
                 attrlist = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "Director", "Writer", "Actors", "Plot", "Language", "Country", "Awards", "Poster", "Metascore", "imdbRating", "imdbVotes", "imdbID", "Type", "DVD", "BoxOffice", "Production", "Website", "Response"]
+
+                #Retrieval from omdb
                 omdbResults = omdb.request(i=imdb_id)
                 omdbData = omdbResults.json()
                 temp = {}
+
+                #Attaches every attribute of movie from omdb into search result
                 for attr in attrlist:
                     temp[attr] = omdbData[attr]
-                searchresults.append(temp)
-            '''
-            for i in range(len(results)):
-                temp = {}
-                attrlist = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "Director", "Writer", "Actors", "Plot", "Language", "Country", "Awards", "Poster", "Metascore", "imdbRating", "imdbVotes", "imdbID", "Type", "DVD", "BoxOffice", "Production", "Website", "Response","lowercase"]
-                for j in range(len(results[i])):
-                    temp[attrlist[j]] = results[i][j]
-                searchresults.append(temp)
-'''
 
+                #searchresults to be displayed by Jinjja in home.html
+                searchresults.append(temp)
+
+        #Redirect to home page & display search results
         return render_template('home.html', accolades=accolades ,is_logged=True, form=form,searchresults = searchresults)
     else:
+
+        #Redirect user to home if user is NOT logged in but somehow manages to use the search bar
+        #Prevent tampering from returning errors
         return render_template('home.html', accolades=accolades)
+
     return render_template('home.html', accolades=accolades,is_logged=True,form=form)
 
+#Route for about page
 @app.route("/about")
 def about():
     return render_template('about.html', accolades=accolades)
 
-
+#Route for register / sign up page
 @app.route("/register", methods=['GET', 'POST'])
 def register():
+
+    #Define 2 checkers
     unok = True
     emok = True
+
+    #Redirects user to home if they are logged in and navigate to the login page
     if session['is_logged']:
         return redirect(url_for('home'))
+
+    #Ensure that user's username & email is unique
     usernames = db.execute("SELECT username FROM users").fetchall()
     emails = db.execute("SELECT email FROM users").fetchall()
     form = RegistrationForm()
@@ -91,7 +108,7 @@ def register():
         if form.email.data == email[0]:
             emok = False
 
-    '''Check For Duplicate Username & Email'''
+    #Allows user to create account if both username and email are unique
     if form.validate_on_submit() and unok and emok:
         db.execute("INSERT INTO users (username, email, password) VALUES (:un, :em, :pw);",{"un": form.username.data, "em": form.email.data, "pw": form.password.data})
         db.commit()
@@ -106,12 +123,15 @@ def register():
     elif not unok and not emok:
         flash(f'The username "{form.username.data}" and email "{form.email.data}" have both been taken!', 'danger')
         return render_template('register.html', title='Register', form=form)
-    '''Return Same Website If Fields Do Not Satisfy Requirements'''
+
+    #Return register / sign up page If Fields Do Not Satisfy Requirements
     return render_template('register.html', title='Register', form=form)
 
-
+#Route for login
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+
+    #Ensures that session object is functional if new user directly goes to login page instead of home
     if 'is_logged' not in session:
         session['is_logged'] = False
     if 'current_user' not in session:
@@ -119,9 +139,9 @@ def login():
     loginok = False
     form = LoginForm()
     if form.validate_on_submit():
-        '''
-        Check For Special Characters As Part Of Special Characters
-        '''
+
+        #Check For Special Characters As Part Of Special Characters to prevent SQL hacking
+
         for letter in form.password.data:
             for character in specialChars:
                 if letter == character:
@@ -135,9 +155,9 @@ def login():
                         return render_template('login.html', title='Login', form=form)
         except:
             print(form.username.data,specialChars)
-        '''
-        Check If Username & Password Are Matching Pairs
-        '''
+
+        #Check If Username & Password Are Matching Pairs
+
 
         userinfo = db.execute("SELECT * FROM users WHERE (username = :un);",{"un": form.username.data}).fetchall()
         ''' userinfo Is A Row Of Data, userinfo[0][3] Is The Password Of User'''
@@ -148,10 +168,12 @@ def login():
 
                 flash(message, 'success')
 
-                '''if form.remember:
+                if form.remember.data:
                     session.permanent = True
                 else:
-                    session.permanent = False'''
+                    session.permanent = False
+
+                #Sets session is_logged to True which is used across all templates
                 session['is_logged'] = True
                 return redirect(url_for('home'))
             else:
@@ -161,30 +183,37 @@ def login():
 
     return render_template('login.html', title='Login', form=form)
 
+#Route for logout
 @app.route("/logout")
 def logout():
+
+    #Sets all session values to not logged in state
     session['is_logged'] = False
     session['current_user'] = ""
     flash("You have been logged out.", "success")
     return redirect(url_for('home'))
 
+#Route for specific movies & information
 @app.route("/movies/<imdb_id>", methods=['GET', 'POST'])
 def movie(imdb_id):
 
+    #Uses Review Form object from forms.py
     form = ReviewForm()
 
+    #Update DB when new form is submitted
     if form.validate_on_submit():
         db.execute("INSERT INTO reviews (userid, imdbid, rating, content) VALUES (:un, :ii, :ra, :co);",{"un": session['current_user'], "ii": imdb_id, "ra": form.select.data, "co": form.content.data})
         db.commit()
 
         return(redirect(url_for('movie', imdb_id=imdb_id)))
-    """Lists details about a single movie."""
 
-    # Make sure movie exists.
+    # Ensure that movie exists
     movie = db.execute("SELECT * FROM movies WHERE imdbid = :id", {'id': imdb_id}).fetchone()
     if movie == None:
         abort(404)
     else:
+
+        #Retrieve additional data from omdb
         imdb_id = movie[3]
         attrlist = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "Director", "Writer", "Actors", "Plot", "Language", "Country", "Awards", "Poster", "Metascore", "imdbRating", "imdbVotes", "imdbID", "Type", "DVD", "BoxOffice", "Production", "Website", "Response"]
         omdbResults = omdb.request(i=imdb_id)
@@ -193,14 +222,13 @@ def movie(imdb_id):
         for attr in attrlist:
             temp[attr] = omdbData[attr]
 
-        for j in range(len(movie)):
-            temp[attrlist[j]] = movie[j]
-        # Get all reviews.
+        # Get all reviews
         revu = db.execute("SELECT * FROM reviews WHERE imdbid = :imdbid",{"imdbid": imdb_id}).fetchall()
         attrlist2 = ["Author", "MovieID", "Rating", "ReviewContent"]
         reviews = []
         temp2 = {}
 
+        #Check if user has submitted a review
         userRev = False
 
         for i in range(len(revu)):
@@ -210,8 +238,12 @@ def movie(imdb_id):
             reviews.append(temp2)
             if temp2['Author'] == session['current_user']:
                 userRev = True
+
+        #Sets reviews to blank list, not None
         if revu == None:
             reviews = []
+
+        #Get average score from Metascore & imdbRating
         try:
             avgR = ( float( temp['Metascore'] ) + float( temp['imdbRating'] ) * 10 ) / 2
         except:
@@ -219,17 +251,23 @@ def movie(imdb_id):
                 avgR = temp['imdbRating']
             except:
                 avgR = temp['Metascore']
+
         return render_template("movie.html", movie=temp, reviews=reviews, avgR=avgR, form = form, userRev=userRev)
 
+#Route for api
 @app.route('/api/<imdb_id>', methods=["GET"])
 def get_api(imdb_id):
 
+    #try / except in case of miscellaneous errors
     try:
+
+        #Get all movie information & reviews
         movie = db.execute("SELECT * FROM movies WHERE imdbid = :id", {"id": imdb_id}).fetchall()
         reviews = db.execute("SELECT * FROM reviews WHERE imdbid = :id", {"id": imdb_id}).fetchall()
         avgS = 0
         c = 0
 
+        #Retrieve movie information from omdb
         imdb_id = movie[0][3]
         attrlist = ["Title", "Year", "Rated", "Released", "Runtime", "Genre", "Director", "Writer", "Actors", "Plot", "Language", "Country", "Awards", "Poster", "Metascore", "imdbRating", "imdbVotes", "imdbID", "Type", "DVD", "BoxOffice", "Production", "Website", "Response"]
         omdbResults = omdb.request(i=imdb_id)
@@ -238,12 +276,15 @@ def get_api(imdb_id):
         for attr in attrlist:
             movieInfo[attr] = omdbData[attr]
 
+        #Outputs average score
         for review in reviews:
             avgS += review[2]
             c += 1
-        avgS = avgS / c
+            avgS = avgS / c
+        #Round to 1 decimal place
         avgS = round(avgS,1)
 
+        #Prepare results to be jsonified, ordered in terms of time added
         finalRes = {}
         finalRes['title'] = movieInfo['Title']
         finalRes['year'] = movieInfo['Year']
@@ -253,24 +294,14 @@ def get_api(imdb_id):
         finalRes['imdb_rating'] = movieInfo['imdbRating']
         finalRes['review_count'] = len(reviews)
         finalRes['average_score'] = avgS
-        '''
-        finalRes = {
-            'title': movieInfo['Title'],
-            'year': movieInfo['Year'],
-            'imdb_id': movieInfo['imdbID'],
-            'director': movieInfo['Director'],
-            'actors': movieInfo['Actors'],
-            'imdb_rating': movieInfo['imdbRating'],
-            'review_count': len(reviews),
-            'average_score': avgS
 
-        }
-        '''
+        #Gives a jsonified output
         return jsonify(finalRes)
 
     except:
         abort(404)
 
+#Return error.html in case of error 404
 @app.errorhandler(404)
 def not_found(error):
     return make_response(render_template('error.html'), 404)

@@ -1,6 +1,6 @@
-# Moviews
+# 2019 Summative 3 - Moveu
 
-Moviews is the premier movie website that collects and provides insights & reviews on a variety of different movies. These reviews range from those that come from professional review websites & also user reviews. User reviews can also submitted to the website & viewed by others.
+Moveu is the premier movie website that collects and provides insights & reviews on a variety of different movies. These reviews range from those that come from professional review websites & also user reviews. User reviews can also submitted to the website & viewed by others.
 
 This project is powered by Flask.
 
@@ -21,3 +21,8 @@ The website is now hosted on `127.0.0.1:5000`.
 
 Resources:
 `Futura.ttf` Downloaded from https://ttfonts.net/download/17298.htm
+
+References:
+Flask Blog Tutorial by Corey Schafer
+Stack Overflow for Bugfixes
+SQL-Alchemy Tutorial from Real Python

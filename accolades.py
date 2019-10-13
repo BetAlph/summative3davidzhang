@@ -1,3 +1,5 @@
+#List of accolades to display
+
 accolades = [
     {
         'author': 'Roger Ebert',
@@ -9,5 +11,6 @@ accolades = [
     }
 ]
 
+#Special characters to omit from passwords
 
 specialChars = ['"',"'"]
