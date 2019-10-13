@@ -19,10 +19,21 @@ To run the flask application, enter `flask run`.
 
 The website is now hosted on `127.0.0.1:5000`.
 
+Video can be found at: https://www.youtube.com/watch?v=rDqfPBNBIjs
+
+# Credits
+
 Resources:
+
 `Futura.ttf` Downloaded from https://ttfonts.net/download/17298.htm
 
+
 References:
+
 Flask Blog Tutorial by Corey Schafer
-Stack Overflow for Bugfixes
+
+Bugfixes from StackOverflow
+
 SQL-Alchemy Tutorial from Real Python
+
+OMDb for Movie Information

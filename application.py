@@ -285,15 +285,16 @@ def get_api(imdb_id):
         avgS = round(avgS,1)
 
         #Prepare results to be jsonified, ordered in terms of time added
-        finalRes = {}
-        finalRes['title'] = movieInfo['Title']
-        finalRes['year'] = movieInfo['Year']
-        finalRes['imdb_id'] = movieInfo['imdbID']
-        finalRes['director'] = movieInfo['Director']
-        finalRes['actors'] = movieInfo['Actors']
-        finalRes['imdb_rating'] = movieInfo['imdbRating']
-        finalRes['review_count'] = len(reviews)
-        finalRes['average_score'] = avgS
+        finalRes = {
+        'title': movieInfo['Title'],
+        'year': movieInfo['Year'],
+        'imdb_id': movieInfo['imdbID'],
+        'director': movieInfo['Director'],
+        'actors': movieInfo['Actors'],
+        'imdb_rating': movieInfo['imdbRating'],
+        'review_count': len(reviews),
+        'average_score': avgS
+        }
 
         #Gives a jsonified output
         return jsonify(finalRes)
