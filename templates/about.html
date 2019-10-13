@@ -1,4 +1,39 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h1>About Page</h1>
+    <br>
+    <center><div class="title col-sm-12">
+    <h1>About Moveu</h1>
+    </div></center>
+    <br>
+    <br>
+    <center><img src="static/img/Moveu-Logo.png" height="265" width="210"></img>  </center>
+    <br>
+    <br>
+    <div>
+      <center> <h1>The best movie reviews in town.</h1></center>
+      <br>
+      <h3>Moveu is the premier movie review webpage. We collect reviews from professional critiques to bring you ratings & reviews from the best of the best.</h3>
+      <br>
+      <h3>Whether you're a casual movie watcher, or an aspiring critique, Moveu givew you the widest range of opinions on movies from a bazillion other critiques & users.</h3>
+    </div>
+    <br>
+    <br>
+    <br>
+    <br>
+    <div class="title col-sm-12">
+      <h2>Accolades From Critiques</h2>
+      {% for accolade in accolades %}
+          <article class="media content-section">
+            <div class="media-body">
+              <div class="article-metadata">
+                <h4 class="mr-2">{{ accolade.title }}</h4>
+              </div>
+              <h5>{{ accolade.author }}</h5>
+            </div>
+          </article>
+      {% endfor %}
+    </div>
+    <br>
+    <br>
+    <br>
 {% endblock content %}

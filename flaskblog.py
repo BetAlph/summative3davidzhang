@@ -71,10 +71,7 @@ def home():
 
 @app.route("/about")
 def about():
-    if session['is_logged']:
-        return render_template('about.html', title='About',is_logged=True)
-    else:
-        return render_template('about.html', title='About')
+    return render_template('about.html', accolades=accolades)
 
 
 @app.route("/register", methods=['GET', 'POST'])
@@ -185,7 +182,6 @@ def movie(imdb_id):
 
     # Make sure movie exists.
     movie = db.execute("SELECT * FROM movies WHERE imdbid = :id", {'id': imdb_id}).fetchone()
-    print(movie)
     if movie == None:
         abort(404)
     else:
@@ -214,11 +210,15 @@ def movie(imdb_id):
             reviews.append(temp2)
             if temp2['Author'] == session['current_user']:
                 userRev = True
-        print(temp)
         if revu == None:
             reviews = []
-        avgR = ( float( temp['Metascore'] ) + float( temp['imdbRating'] ) * 10 ) / 2
-
+        try:
+            avgR = ( float( temp['Metascore'] ) + float( temp['imdbRating'] ) * 10 ) / 2
+        except:
+            try:
+                avgR = temp['imdbRating']
+            except:
+                avgR = temp['Metascore']
         return render_template("movie.html", movie=temp, reviews=reviews, avgR=avgR, form = form, userRev=userRev)
 
 @app.route('/api/<imdb_id>', methods=["GET"])
@@ -243,8 +243,6 @@ def get_api(imdb_id):
             c += 1
         avgS = avgS / c
         avgS = round(avgS,1)
-        print(avgS)
-        print(movieInfo)
 
         finalRes = {}
         finalRes['title'] = movieInfo['Title']
@@ -268,9 +266,7 @@ def get_api(imdb_id):
 
         }
         '''
-        print(type(finalRes))
         return jsonify(finalRes)
-        print("jsonified")
 
     except:
         abort(404)

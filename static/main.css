@@ -20,6 +20,7 @@ nav {
 
 h1, h2, h3, h4, h5, h6 {
   color: #444444;
+  font-family: "Futura"
 }
 
 .navbar .navbar-expand-md .navbar-dark .bg-steel .fixed-top {
