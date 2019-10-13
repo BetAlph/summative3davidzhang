@@ -8,6 +8,8 @@ This project is powered by Flask.
 
 Before running the application, execute the commands below first:
 
+Mac/Linux/Windows: `python import.py`
+
 Mac/Linux: `export FLASK_APP=application.py`
 Windows: `set FLASK_APP=application.py`
 
